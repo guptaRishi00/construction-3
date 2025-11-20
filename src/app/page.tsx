@@ -7,14 +7,10 @@ import {
   X,
   MoveRight,
   ArrowUpRight,
-  Phone,
-  Mail,
-  MapPin,
   Instagram,
   Linkedin,
   Twitter,
   Quote,
-  ArrowUp,
 } from "lucide-react";
 
 // --- TYPES ---
@@ -38,10 +34,21 @@ interface Founder {
   bio: string;
 }
 
-interface Testimonial {
-  quote: string;
-  author: string;
-  company: string;
+interface NavItemProps {
+  onClick: () => void;
+  label: string;
+  number: string;
+}
+
+interface ServiceCardProps {
+  num: string;
+  title: string;
+  desc: string;
+}
+
+interface ProjectSlideProps {
+  project: Project;
+  onClick: (p: Project) => void;
 }
 
 // --- MOCK DATA ---
@@ -89,7 +96,7 @@ const PROJECTS_DATA: Project[] = [
     client: "TFL",
     value: "$300M",
     desc: "Underground engineering marvel involving deep-tunnel excavation beneath historic structures without causing surface settlement.",
-    img: "https://images.unsplash.com/photo-1590486803833-1c5dc8ce2fe3?auto=format&fit=crop&q=80&w=1000",
+    img: "https://images.unsplash.com/photo-1556695736-d287caebc48e?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8cHVibGljJTIwdHJhbnNwb3J0fGVufDB8fDB8fHww",
   },
   {
     id: 5,
@@ -119,35 +126,25 @@ const FOUNDERS: Founder[] = [
   },
 ];
 
-const TESTIMONIALS: Testimonial[] = [
-  {
-    quote:
-      "Quad Infra didn't just build a facility; they engineered a legacy. Their attention to structural integrity is unmatched.",
-    author: "James Sterling",
-    company: "CEO, Sterling Group",
-  },
-  {
-    quote:
-      "The most professional team we've worked with in 20 years of development. On time, under budget, and breathtaking results.",
-    author: "Elena Rodriguez",
-    company: "Director, Urban Future",
-  },
-];
-
-// --- BRAND COLORS ---
+// --- THEME CONFIGURATION ---
 const THEME = {
-  navy: "#206E7D",
-  darkNavy: "#0F2529",
-  teal: "#2B9E9F",
-  green: "#35B37D",
+  navy: "#003057",
+  blue: "#005EB8",
+  yellow: "#FCE340",
+  bg: "#F0F4F1",
   white: "#FFFFFF",
+  slate: "#64748B",
+  border: "#E2E8F0",
 };
 
-// --- HELPER HOOKS ---
-const useScrollReveal = (): [
-  React.RefObject<HTMLDivElement | null>,
-  boolean
-] => {
+const LOGO_COLORS = {
+  bar1: "#085f72",
+  bar2: "#209f9d",
+  bar3: "#22916e",
+};
+
+// --- ANIMATION HOOKS ---
+const useScrollReveal = () => {
   const [isVisible, setIsVisible] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -156,30 +153,25 @@ const useScrollReveal = (): [
       ([entry]) => setIsVisible(entry.isIntersecting),
       { threshold: 0.1 }
     );
-
-    const currentRef = ref.current;
-    if (currentRef) observer.observe(currentRef);
-
+    if (ref.current) observer.observe(ref.current);
     return () => {
-      if (currentRef) observer.unobserve(currentRef);
+      if (ref.current) observer.unobserve(ref.current);
     };
   }, []);
 
-  return [ref, isVisible];
+  return [ref, isVisible] as const;
 };
 
-// --- COMPONENTS ---
+// --- UI COMPONENTS ---
 
-interface RevealTextProps {
-  children: React.ReactNode;
-  delay?: number;
-  className?: string;
-}
-
-const RevealText: React.FC<RevealTextProps> = ({
+const RevealText = ({
   children,
   delay = 0,
   className = "",
+}: {
+  children: React.ReactNode;
+  delay?: number;
+  className?: string;
 }) => {
   const [ref, isVisible] = useScrollReveal();
   return (
@@ -196,324 +188,326 @@ const RevealText: React.FC<RevealTextProps> = ({
   );
 };
 
-interface NavItemProps {
-  onClick: () => void;
-  label: string;
-  number: string;
-}
-
 const NavItem: React.FC<NavItemProps> = ({ onClick, label, number }) => (
   <button
     onClick={onClick}
-    className="w-full group flex items-center justify-between border-b border-white/10 py-6 hover:pl-4 transition-all duration-300 text-left"
+    className="w-full group flex items-center justify-between border-b border-[color:var(--navy)]/10 py-6 md:py-8 hover:pl-8 transition-all duration-500 text-left"
   >
-    <span className="text-3xl font-light text-white group-hover:text-[color:var(--teal)] transition-colors">
+    <span className="text-3xl md:text-5xl font-light text-[color:var(--navy)] group-hover:text-[color:var(--blue)] transition-colors tracking-tight">
       {label}
     </span>
-    <span className="text-xs font-mono text-white/50 group-hover:text-white transition-colors">
+    <span className="text-xs md:text-sm font-mono text-[color:var(--navy)]/40 group-hover:text-[color:var(--navy)] transition-colors">
       ({number})
     </span>
   </button>
 );
 
-interface ServiceCardProps {
-  num: string;
-  title: string;
-  desc: string;
-}
-
 const ServiceCard: React.FC<ServiceCardProps> = ({ num, title, desc }) => {
   return (
-    <div className="group relative border-t border-white/20 py-12 hover:bg-white/5 transition-colors duration-500">
-      <div className="container mx-auto px-6 flex flex-col md:flex-row gap-8 items-start">
-        <span className="font-mono text-[color:var(--teal)] text-sm">
-          0{num}
-        </span>
+    <div className="group relative border-t border-[color:var(--navy)]/10 py-12 md:py-16 hover:bg-white transition-colors duration-500">
+      <div className="container mx-auto px-6 flex flex-col md:flex-row gap-6 md:gap-12 items-start">
+        <div className="w-12 h-12 rounded-full border border-[color:var(--navy)]/20 flex items-center justify-center text-[color:var(--blue)] font-mono text-sm group-hover:bg-[color:var(--yellow)] group-hover:border-[color:var(--yellow)] group-hover:text-[color:var(--navy)] transition-all duration-500">
+          {num}
+        </div>
         <div className="flex-1">
-          <h3 className="text-3xl md:text-4xl font-light text-white mb-4 group-hover:translate-x-4 transition-transform duration-500">
+          <h3 className="text-3xl md:text-5xl font-light text-[color:var(--navy)] mb-4 md:mb-6 group-hover:translate-x-4 transition-transform duration-500">
             {title}
           </h3>
-          <p className="max-w-xl text-slate-400 font-light leading-relaxed opacity-0 h-0 group-hover:opacity-100 group-hover:h-auto transition-all duration-500 overflow-hidden">
+          <p className="max-w-xl text-slate-600 text-base md:text-lg font-light leading-relaxed opacity-100 md:opacity-0 md:h-0 md:group-hover:opacity-100 md:group-hover:h-auto transition-all duration-500 overflow-hidden">
             {desc}
           </p>
         </div>
-        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform rotate-45 group-hover:rotate-0">
-          <ArrowUpRight className="text-[color:var(--teal)] w-8 h-8" />
+        <div className="hidden md:block opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform rotate-45 group-hover:rotate-0">
+          <ArrowUpRight className="text-[color:var(--blue)] w-12 h-12" />
         </div>
       </div>
     </div>
   );
 };
-
-interface ProjectSlideProps {
-  project: Project;
-  onClick: (p: Project) => void;
-}
 
 const ProjectSlide: React.FC<ProjectSlideProps> = ({ project, onClick }) => {
   return (
     <div
       onClick={() => onClick(project)}
-      className="min-w-[85vw] md:min-w-[600px] h-[600px] relative group cursor-pointer snap-center"
+      className="min-w-[85vw] md:min-w-[600px] h-[500px] md:h-[650px] relative group cursor-pointer snap-center overflow-hidden bg-white shadow-sm first:ml-6 md:first:ml-0"
     >
-      <div className="absolute inset-0 bg-slate-900 overflow-hidden">
-        {/* Note: Using standard img for simplicity. In Next.js, prefer next/image if domains are configured */}
+      <div className="w-full h-[80%] md:h-[85%] overflow-hidden relative">
         <img
           src={project.img}
           alt={project.title}
-          className="w-full h-full object-cover opacity-60 group-hover:opacity-80 group-hover:scale-105 transition-all duration-700"
+          className="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[color:var(--darkNavy)] to-transparent opacity-80"></div>
+        <div className="absolute inset-0 bg-[color:var(--navy)]/0 group-hover:bg-[color:var(--navy)]/10 transition-colors duration-500"></div>
       </div>
-      <div className="absolute bottom-0 left-0 p-10 w-full z-10">
-        <div className="flex justify-between items-end border-b border-white/20 pb-6 mb-6">
-          <div>
-            <p className="text-[color:var(--teal)] font-mono text-xs uppercase tracking-widest mb-2">
-              {project.category}
-            </p>
-            <h3 className="text-4xl md:text-5xl font-light text-white">
-              {project.title}
-            </h3>
-          </div>
-          <p className="text-white/40 font-mono text-sm">{project.year}</p>
+      <div className="h-[20%] md:h-[15%] p-6 flex justify-between items-center border-t border-[color:var(--navy)]/5 bg-white relative z-10">
+        <div>
+          <h3 className="text-xl md:text-2xl text-[color:var(--navy)] font-medium">
+            {project.title}
+          </h3>
+          <p className="text-[color:var(--blue)] font-mono text-xs uppercase tracking-widest mt-1">
+            {project.category}
+          </p>
         </div>
-        <div className="flex justify-between items-center">
-          <span className="text-white/60 text-sm group-hover:text-white transition-colors">
-            View Case Study
-          </span>
-          <div className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center group-hover:bg-[color:var(--teal)] group-hover:border-[color:var(--teal)] group-hover:text-white transition-all duration-300 text-white/50">
-            <ArrowRight size={16} />
-          </div>
+        <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[color:var(--bg)] flex items-center justify-center text-[color:var(--navy)] group-hover:bg-[color:var(--yellow)] transition-colors duration-300">
+          <ArrowRight size={20} />
         </div>
       </div>
     </div>
   );
 };
 
-// --- PAGES ---
+// --- SUB-PAGES (COMPONENTS) ---
 
-interface PageProps {
+const HomePage = ({
+  navigate,
+  setProject,
+}: {
   navigate: (page: string) => void;
   setProject: (p: Project) => void;
-}
-
-const HomePage: React.FC<PageProps> = ({ navigate, setProject }) => {
+}) => {
   return (
     <>
-      {/* HERO */}
-      <section className="relative min-h-screen flex items-center pt-20">
-        <div className="absolute inset-0 z-0">
-          <img
-            src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=2000"
-            alt="Modern Architecture"
-            className="w-full h-full object-cover opacity-40"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-[color:var(--darkNavy)] via-[color:var(--darkNavy)]/80 to-transparent"></div>
-          <div className="absolute inset-0 bg-gradient-to-t from-[color:var(--darkNavy)] via-transparent to-transparent"></div>
-        </div>
+      {/* HERO SECTION */}
+      <section className="relative min-h-[100svh] flex items-center pt-20 overflow-hidden bg-[color:var(--bg)]">
+        <div className="absolute top-[-10%] right-[-10%] w-[400px] md:w-[800px] h-[400px] md:h-[800px] bg-[color:var(--yellow)]/20 rounded-full blur-[80px] md:blur-[120px] mix-blend-multiply animate-pulse-slow"></div>
+        <div className="absolute bottom-[-10%] left-[-10%] w-[300px] md:w-[600px] h-[300px] md:h-[600px] bg-[color:var(--blue)]/10 rounded-full blur-[60px] md:blur-[100px] mix-blend-multiply"></div>
 
         <div className="container mx-auto px-6 relative z-10">
-          <div className="max-w-5xl">
-            <RevealText className="mb-2">
+          <div className="max-w-full md:max-w-[90vw]">
+            <RevealText className="mb-6">
               <div className="flex items-center gap-4">
-                <span className="w-2 h-2 bg-[color:var(--green)] rounded-full animate-pulse"></span>
-                <span className="text-[color:var(--teal)] font-mono text-sm tracking-[0.3em] uppercase">
-                  Reshaping Horizons
+                <div className="w-3 h-3 bg-[color:var(--yellow)] rounded-full border border-[color:var(--navy)]"></div>
+                <span className="text-[color:var(--navy)] font-mono text-xs md:text-sm tracking-[0.3em] uppercase">
+                  Est. 1998 — Global Engineering
                 </span>
               </div>
             </RevealText>
 
-            <div className="space-y-2 mb-12">
+            <div className="space-y-2 md:space-y-4 mb-12 md:mb-16">
               <RevealText delay={100}>
-                <h1 className="text-6xl md:text-8xl lg:text-9xl font-light text-white tracking-tight leading-[0.9]">
+                <h1 className="text-[14vw] md:text-[8vw] font-bold text-[color:var(--navy)] tracking-tighter leading-[0.9] md:leading-[0.85] mix-blend-darken">
                   Constructing
                 </h1>
               </RevealText>
               <RevealText delay={200}>
-                <h1 className="text-6xl md:text-8xl lg:text-9xl font-light text-white tracking-tight leading-[0.9]">
-                  The{" "}
-                  <span className="font-serif italic text-[color:var(--teal)]">
-                    Impossible.
-                  </span>
-                </h1>
+                <div className="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-8">
+                  <h1 className="text-[14vw] md:text-[8vw] font-serif italic font-light text-[color:var(--blue)] tracking-tighter leading-[0.9] md:leading-[0.85]">
+                    The Future
+                  </h1>
+                  <div className="h-[1px] w-24 md:flex-grow bg-[color:var(--navy)]/20 mt-2 md:mt-8"></div>
+                </div>
               </RevealText>
             </div>
 
             <RevealText delay={400}>
-              <div className="flex flex-col md:flex-row items-start md:items-center gap-12 border-t border-white/10 pt-8 max-w-2xl">
-                <p className="text-slate-400 text-lg leading-relaxed">
-                  Quad Infra is a multidisciplinary engineering firm dedicated
-                  to building infrastructure that defines the next century of
-                  human progress.
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8 md:gap-12 border-t border-[color:var(--navy)]/10 pt-8 md:pt-12">
+                <p className="text-[color:var(--navy)] text-lg md:text-2xl font-light leading-relaxed max-w-2xl">
+                  QuadFour Infra Pvt Ltd is a multidisciplinary advisory and
+                  engineering firm. We bridge financial clarity with structural
+                  reality to build the unimaginable.
                 </p>
-                <button
-                  onClick={() => navigate("projects")}
-                  className="whitespace-nowrap bg-white text-[color:var(--darkNavy)] px-8 py-4 font-bold text-sm uppercase tracking-widest hover:bg-[color:var(--teal)] hover:text-white transition-colors duration-300"
-                >
-                  View Our Legacy
-                </button>
+                <div className="flex gap-6 w-full md:w-auto">
+                  <button
+                    onClick={() => navigate("contact")}
+                    className="w-full md:w-auto group relative px-8 py-4 overflow-hidden rounded-full bg-[color:var(--navy)] text-white font-bold text-sm uppercase tracking-widest transition-all md:hover:pr-12 flex justify-center md:justify-start items-center"
+                  >
+                    <span className="relative z-10">Start Project</span>
+                    <span className="static md:absolute md:right-4 md:top-1/2 md:-translate-y-1/2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity text-[color:var(--yellow)] ml-2 md:ml-0">
+                      <ArrowRight size={16} />
+                    </span>
+                  </button>
+                </div>
               </div>
             </RevealText>
           </div>
         </div>
       </section>
 
-      {/* STATS MARQUEE */}
-      <section className="py-20 border-y border-white/5 overflow-hidden bg-black/20">
-        <div className="flex gap-20 animate-marquee whitespace-nowrap">
+      {/* MARQUEE */}
+      <section className="py-12 md:py-20 border-y border-[color:var(--navy)]/5 overflow-hidden bg-white">
+        <div className="flex gap-12 md:gap-24 animate-marquee whitespace-nowrap">
           {[1, 2, 3, 4].map((i) => (
             <React.Fragment key={i}>
-              <span className="text-8xl font-bold text-transparent stroke-text-white opacity-20">
-                ENGINEERING
+              <span className="text-5xl md:text-8xl font-bold text-transparent stroke-navy opacity-20">
+                PRECISION
               </span>
-              <span className="text-8xl font-serif italic text-[color:var(--teal)] opacity-50">
-                EXCELLENCE
+              <div className="w-2 h-2 md:w-4 md:h-4 bg-[color:var(--yellow)] rounded-full self-center"></div>
+              <span className="text-5xl md:text-8xl font-serif italic text-[color:var(--navy)]">
+                SCALE
               </span>
-              <span className="text-8xl font-bold text-transparent stroke-text-white opacity-20">
-                INNOVATION
+              <div className="w-2 h-2 md:w-4 md:h-4 bg-[color:var(--yellow)] rounded-full self-center"></div>
+              <span className="text-5xl md:text-8xl font-bold text-transparent stroke-navy opacity-20">
+                IMPACT
               </span>
             </React.Fragment>
           ))}
         </div>
       </section>
 
-      {/* ABOUT & FOUNDERS */}
-      <section className="py-32 relative">
+      {/* INTRODUCTION GRID */}
+      <section className="py-20 md:py-32 relative">
         <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-end mb-32">
-            <div className="lg:col-span-7">
-              <h2 className="text-4xl md:text-5xl text-white font-light leading-tight mb-12">
-                We bridge the gap between <br />
-                <span className="text-[color:var(--teal)]">
-                  visionary design
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-20 md:mb-24">
+            <div className="lg:col-span-8">
+              <h2 className="text-4xl md:text-7xl text-[color:var(--navy)] font-light leading-[1.1] tracking-tight">
+                We are the{" "}
+                <span className="text-[color:var(--blue)] font-serif italic">
+                  architects
                 </span>{" "}
-                and <br />
-                <span className="text-[color:var(--teal)]">
-                  structural reality.
-                </span>
+                of <br />
+                modern civilization.
               </h2>
-              <div className="grid grid-cols-2 gap-8">
-                <div>
-                  <h3 className="text-4xl font-bold text-white mb-2">
-                    25<span className="text-[color:var(--green)]">+</span>
-                  </h3>
-                  <p className="text-slate-500 font-mono text-sm">
-                    YEARS OF EXCELLENCE
-                  </p>
-                </div>
-                <div>
-                  <h3 className="text-4xl font-bold text-white mb-2">
-                    $2B<span className="text-[color:var(--green)]">+</span>
-                  </h3>
-                  <p className="text-slate-500 font-mono text-sm">
-                    PROJECT VALUE DELIVERED
-                  </p>
-                </div>
-              </div>
             </div>
-            <div className="lg:col-span-5 relative">
-              <p className="text-slate-400 text-lg leading-relaxed mb-8">
-                From the deepest foundations to the highest spires, Quad Infra
-                brings a level of precision that is unmatched in the industry.
+            <div className="lg:col-span-4 flex flex-col justify-end">
+              <p className="text-slate-600 text-base md:text-lg leading-relaxed mb-8">
+                From the deepest foundations to the highest spires, QuadFour
+                Infra Pvt Ltd brings unmatched precision. We don't just build;
+                we define skylines.
               </p>
-              <button
+              <a
+                href="#"
                 onClick={() => navigate("contact")}
-                className="inline-flex items-center gap-4 text-white border-b border-[color:var(--teal)] pb-2 hover:gap-6 transition-all"
+                className="inline-flex items-center gap-4 text-[color:var(--navy)] font-bold border-b border-[color:var(--navy)] pb-1 hover:gap-8 transition-all w-max"
               >
-                Get in Touch <MoveRight className="text-[color:var(--teal)]" />
-              </button>
+                Read Our Story <MoveRight size={18} />
+              </a>
             </div>
           </div>
 
-          {/* FOUNDERS SECTION */}
-          <div className="border-t border-white/10 pt-20">
-            <p className="text-[color:var(--teal)] font-mono text-sm tracking-widest uppercase mb-12">
-              The Visionaries
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-              {FOUNDERS.map((founder, idx) => (
-                <div key={idx} className="group relative">
-                  <div className="aspect-[4/5] overflow-hidden mb-6 grayscale group-hover:grayscale-0 transition-all duration-700">
-                    <img
-                      src={founder.img}
-                      alt={founder.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                    />
-                  </div>
-                  <h3 className="text-2xl text-white font-light">
-                    {founder.name}
-                  </h3>
-                  <p className="text-[color:var(--teal)] text-sm font-mono mb-4">
-                    {founder.role}
-                  </p>
-                  <p className="text-slate-400 leading-relaxed max-w-md">
-                    {founder.bio}
-                  </p>
-                </div>
-              ))}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+            <div className="md:col-span-2 bg-white p-8 md:p-12 rounded-3xl shadow-sm border border-[color:var(--navy)]/5 min-h-[300px] md:min-h-[400px] flex flex-col justify-between group hover:shadow-xl transition-all duration-500">
+              <div className="w-12 h-12 md:w-16 md:h-16 bg-[color:var(--bg)] rounded-full flex items-center justify-center mb-8 group-hover:bg-[color:var(--yellow)] transition-colors">
+                <ArrowUpRight size={24} className="text-[color:var(--navy)]" />
+              </div>
+              <div>
+                <h3 className="text-3xl md:text-4xl font-bold text-[color:var(--navy)] mb-2 md:mb-4">
+                  25+ Years
+                </h3>
+                <p className="text-slate-500 text-sm md:text-base">
+                  Of defining global infrastructure standards.
+                </p>
+              </div>
+            </div>
+            <div className="bg-[color:var(--navy)] p-8 md:p-12 rounded-3xl shadow-sm min-h-[300px] md:min-h-[400px] flex flex-col justify-between text-white group relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-40 h-40 md:w-64 md:h-64 bg-[color:var(--blue)] rounded-full blur-[60px] md:blur-[80px] opacity-50 group-hover:opacity-100 transition-opacity"></div>
+              <Quote className="text-[color:var(--yellow)] w-10 h-10 md:w-12 md:h-12 relative z-10" />
+              <div className="relative z-10">
+                <p className="text-xl md:text-2xl font-light leading-relaxed mb-6">
+                  "They don't build structures; they build legacies."
+                </p>
+                <p className="font-mono text-sm text-[color:var(--yellow)]">
+                  James Sterling, CEO
+                </p>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* SERVICES */}
-      <section className="py-32 bg-black/20">
-        <div className="container mx-auto px-6 mb-20">
-          <h2 className="text-4xl md:text-6xl text-white font-light mb-6">
-            Core Capabilities
+      {/* FOUNDERS */}
+      <section className="py-20 border-t border-[color:var(--navy)]/5">
+        <div className="container mx-auto px-6">
+          <div className="flex justify-between items-end mb-12 md:mb-16">
+            <h3 className="text-[color:var(--navy)] text-3xl font-light">
+              The Visionaries
+            </h3>
+            <button className="hidden md:block text-[color:var(--blue)] font-bold hover:underline">
+              Meet the full team
+            </button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-8">
+            {FOUNDERS.map((founder, idx) => (
+              <div
+                key={idx}
+                className="flex flex-col md:flex-row gap-6 items-start group cursor-pointer"
+              >
+                <div className="w-full md:w-32 h-64 md:h-40 overflow-hidden rounded-lg flex-shrink-0">
+                  <img
+                    src={founder.img}
+                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 group-hover:scale-110"
+                    alt={founder.name}
+                  />
+                </div>
+                <div>
+                  <h4 className="text-2xl text-[color:var(--navy)] font-bold group-hover:text-[color:var(--blue)] transition-colors">
+                    {founder.name}
+                  </h4>
+                  <p className="text-sm font-mono text-slate-500 mb-3 uppercase tracking-wider">
+                    {founder.role}
+                  </p>
+                  <p className="text-slate-600 leading-relaxed text-sm">
+                    {founder.bio}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* SERVICES LIST */}
+      <section className="py-20 md:py-32 bg-white relative">
+        <div className="container mx-auto px-6 mb-12 md:mb-20">
+          <h2 className="text-5xl md:text-8xl text-[color:var(--navy)] font-bold mb-8 opacity-5 md:opacity-10 select-none absolute top-10 left-0 w-full text-center pointer-events-none">
+            CAPABILITIES
           </h2>
-          <p className="text-slate-400 max-w-2xl">
-            We deliver end-to-end solutions for the most demanding environments
-            on Earth.
-          </p>
+          <div className="flex flex-col md:flex-row justify-between items-end relative z-10 pt-8 md:pt-12">
+            <h2 className="text-3xl md:text-6xl text-[color:var(--navy)] font-light mb-4 md:mb-0">
+              What We Do
+            </h2>
+            <p className="text-slate-500 max-w-md text-left md:text-right">
+              End-to-end engineering solutions for the most demanding
+              environments.
+            </p>
+          </div>
         </div>
 
         <div>
           <ServiceCard
-            num="1"
+            num="01"
             title="General Contracting"
             desc="Managing complex supply chains and large-scale labor forces to deliver skyscrapers and stadiums on time."
           />
           <ServiceCard
-            num="2"
+            num="02"
             title="Civil Infrastructure"
             desc="Roads, bridges, dams, and tunnels. We move the earth to connect people and commerce."
           />
           <ServiceCard
-            num="3"
+            num="03"
             title="Sustainable Energy"
             desc="Solar farms, wind turbines, and hydroelectric plants. Building the power grid of tomorrow."
           />
           <ServiceCard
-            num="4"
+            num="04"
             title="Industrial Engineering"
             desc="Factories, warehouses, and logistics hubs optimized for automation and high throughput."
           />
         </div>
       </section>
 
-      {/* PROJECTS HORIZONTAL */}
-      <section className="py-20 overflow-hidden">
-        <div className="container mx-auto px-6 mb-12 flex justify-between items-end">
+      {/* PROJECTS */}
+      <section className="py-20 md:py-32 bg-[color:var(--bg)] overflow-hidden">
+        <div className="container mx-auto px-6 mb-12 md:mb-16 flex justify-between items-end">
           <div>
-            <p className="text-[color:var(--teal)] font-mono text-sm tracking-widest uppercase mb-4">
+            <p className="text-[color:var(--blue)] font-mono text-xs md:text-sm tracking-widest uppercase mb-2 md:mb-4">
               Selected Works
             </p>
-            <h2 className="text-4xl md:text-6xl text-white font-light">
+            <h2 className="text-3xl md:text-6xl text-[color:var(--navy)] font-light">
               Recent Landmarks
             </h2>
           </div>
-          <div className="hidden md:flex gap-4">
-            <button
-              onClick={() => navigate("projects")}
-              className="px-6 py-3 border border-white/20 rounded-full text-white hover:bg-white hover:text-black transition-colors text-sm uppercase tracking-widest"
-            >
-              View All
+          <div className="flex gap-4 hidden md:flex">
+            <button className="w-14 h-14 rounded-full border border-[color:var(--navy)]/20 flex items-center justify-center hover:bg-[color:var(--navy)] hover:text-white transition-all">
+              <ArrowRight className="rotate-180" />
+            </button>
+            <button className="w-14 h-14 rounded-full border border-[color:var(--navy)]/20 flex items-center justify-center hover:bg-[color:var(--navy)] hover:text-white transition-all">
+              <ArrowRight />
             </button>
           </div>
         </div>
 
-        <div className="flex overflow-x-auto gap-8 px-6 pb-12 snap-x snap-mandatory no-scrollbar">
+        <div className="flex overflow-x-auto gap-4 md:gap-8 px-6 pb-12 snap-x snap-mandatory no-scrollbar pl-6 md:pl-[max(24px,calc((100vw-1280px)/2))]">
           {PROJECTS_DATA.map((p) => (
             <ProjectSlide
               key={p.id}
@@ -526,45 +520,44 @@ const HomePage: React.FC<PageProps> = ({ navigate, setProject }) => {
           ))}
         </div>
       </section>
-
-      {/* TESTIMONIALS */}
-      <section className="py-32 bg-[color:var(--darkNavy)] relative">
-        <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
-            {TESTIMONIALS.map((t, idx) => (
-              <div
-                key={idx}
-                className="relative p-10 border border-white/5 bg-white/[0.02]"
-              >
-                <Quote className="text-[color:var(--teal)] w-12 h-12 mb-8 opacity-50" />
-                <p className="text-2xl text-white font-light leading-relaxed mb-8">
-                  "{t.quote}"
-                </p>
-                <div>
-                  <p className="text-white font-bold">{t.author}</p>
-                  <p className="text-slate-500 text-sm">{t.company}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
     </>
   );
 };
 
-const ProjectsPage: React.FC<PageProps> = ({ navigate, setProject }) => {
+const ProjectsPage = ({
+  navigate,
+  setProject,
+}: {
+  navigate: (page: string) => void;
+  setProject: (p: Project) => void;
+}) => {
   return (
-    <div className="pt-32 pb-20 container mx-auto px-6">
-      <h1 className="text-5xl md:text-7xl text-white font-light mb-6">
-        Our Portfolio
-      </h1>
-      <p className="text-slate-400 text-xl max-w-2xl mb-20">
-        A curated selection of our most ambitious engineering feats from around
-        the globe.
-      </p>
+    <div className="pt-24 md:pt-32 pb-20 container mx-auto px-6 min-h-screen">
+      <div className="mb-16 md:mb-24 border-b border-[color:var(--navy)]/10 pb-12">
+        <h1 className="text-5xl md:text-8xl text-[color:var(--navy)] font-bold tracking-tighter mb-8">
+          Our Portfolio
+        </h1>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8">
+          <p className="text-slate-600 text-lg md:text-xl max-w-2xl">
+            A curated selection of our most ambitious engineering feats from
+            around the globe.
+          </p>
+          <div className="flex flex-wrap gap-3 md:gap-4">
+            {["All", "Commercial", "Infrastructure", "Residential"].map(
+              (cat) => (
+                <button
+                  key={cat}
+                  className="px-4 py-2 rounded-full border border-[color:var(--navy)]/20 text-[color:var(--navy)] hover:bg-[color:var(--navy)] hover:text-white transition-colors text-sm"
+                >
+                  {cat}
+                </button>
+              )
+            )}
+          </div>
+        </div>
+      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-20">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-16 md:gap-y-24">
         {PROJECTS_DATA.map((p) => (
           <div
             key={p.id}
@@ -574,26 +567,26 @@ const ProjectsPage: React.FC<PageProps> = ({ navigate, setProject }) => {
             }}
             className="group cursor-pointer"
           >
-            <div className="aspect-[4/3] overflow-hidden mb-6 bg-slate-800">
+            <div className="aspect-[4/3] overflow-hidden mb-6 md:mb-8 rounded-sm bg-slate-200 relative">
+              <div className="absolute top-4 left-4 bg-white px-3 py-1 text-xs font-bold uppercase tracking-widest text-[color:var(--navy)] z-10">
+                {p.category}
+              </div>
               <img
                 src={p.img}
                 alt={p.title}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-80 group-hover:opacity-100"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
               />
             </div>
-            <div className="flex justify-between items-start">
+            <div className="flex justify-between items-end border-b border-[color:var(--navy)]/10 pb-6 group-hover:border-[color:var(--blue)] transition-colors">
               <div>
-                <p className="text-[color:var(--teal)] font-mono text-xs uppercase tracking-widest mb-2">
-                  {p.category}
-                </p>
-                <h3 className="text-3xl text-white font-light group-hover:text-[color:var(--teal)] transition-colors">
+                <h3 className="text-2xl md:text-4xl text-[color:var(--navy)] font-light mb-2 group-hover:text-[color:var(--blue)] transition-colors">
                   {p.title}
                 </h3>
-                <p className="text-slate-500 mt-2">{p.location}</p>
+                <p className="text-slate-500 font-mono text-sm">{p.location}</p>
               </div>
-              <div className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-all -translate-x-4 group-hover:translate-x-0">
-                <ArrowRight size={16} />
-              </div>
+              <span className="text-[color:var(--navy)] font-mono text-sm">
+                {p.year}
+              </span>
             </div>
           </div>
         ))}
@@ -602,35 +595,72 @@ const ProjectsPage: React.FC<PageProps> = ({ navigate, setProject }) => {
   );
 };
 
-interface ProjectDetailProps {
-  project: Project | null;
-  navigate: (page: string) => void;
-}
-
-const ProjectDetailPage: React.FC<ProjectDetailProps> = ({
+const ProjectDetailPage = ({
   project,
   navigate,
+}: {
+  project: Project | null;
+  navigate: (page: string) => void;
 }) => {
   if (!project) return null;
 
   return (
-    <div className="pt-32 pb-20">
+    <div className="pt-24 md:pt-32 pb-20 bg-white min-h-screen">
       <div className="container mx-auto px-6 mb-12">
         <button
           onClick={() => navigate("projects")}
-          className="text-slate-500 hover:text-white flex items-center gap-2 mb-8"
+          className="text-slate-500 hover:text-[color:var(--navy)] flex items-center gap-2 mb-8 md:mb-12 font-medium transition-colors text-sm uppercase tracking-widest"
         >
           <ArrowRight className="rotate-180" size={16} /> Back to Projects
         </button>
-        <h1 className="text-5xl md:text-8xl text-white font-light mb-6">
-          {project.title}
-        </h1>
-        <p className="text-[color:var(--teal)] text-xl font-mono">
-          {project.category} — {project.year}
-        </p>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12 mb-12 md:mb-20">
+          <div className="lg:col-span-8">
+            <h1 className="text-4xl md:text-8xl text-[color:var(--navy)] font-bold tracking-tighter mb-6 md:mb-8 leading-[1.1] md:leading-[0.9]">
+              {project.title}
+            </h1>
+            <p className="text-[color:var(--blue)] text-xl md:text-2xl font-light max-w-2xl">
+              {project.desc}
+            </p>
+          </div>
+          <div className="lg:col-span-4 flex flex-col justify-end space-y-6">
+            <div className="flex justify-between border-b border-slate-200 pb-2">
+              <span className="text-slate-500 text-sm uppercase tracking-widest">
+                Client
+              </span>
+              <span className="text-[color:var(--navy)] font-medium">
+                {project.client}
+              </span>
+            </div>
+            <div className="flex justify-between border-b border-slate-200 pb-2">
+              <span className="text-slate-500 text-sm uppercase tracking-widest">
+                Location
+              </span>
+              <span className="text-[color:var(--navy)] font-medium">
+                {project.location}
+              </span>
+            </div>
+            <div className="flex justify-between border-b border-slate-200 pb-2">
+              <span className="text-slate-500 text-sm uppercase tracking-widest">
+                Value
+              </span>
+              <span className="text-[color:var(--navy)] font-medium">
+                {project.value}
+              </span>
+            </div>
+            <div className="flex justify-between border-b border-slate-200 pb-2">
+              <span className="text-slate-500 text-sm uppercase tracking-widest">
+                Year
+              </span>
+              <span className="text-[color:var(--navy)] font-medium">
+                {project.year}
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="w-full h-[60vh] md:h-[80vh] mb-20">
+      <div className="w-full h-[50vh] md:h-[70vh] mb-16 md:mb-24 parallax-container overflow-hidden">
         <img
           src={project.img}
           alt={project.title}
@@ -638,44 +668,31 @@ const ProjectDetailPage: React.FC<ProjectDetailProps> = ({
         />
       </div>
 
-      <div className="container mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-16">
-        <div className="lg:col-span-4 space-y-8">
-          <div className="border-t border-white/10 pt-4">
-            <p className="text-slate-500 text-sm uppercase tracking-widest mb-1">
-              Client
-            </p>
-            <p className="text-white text-xl">{project.client}</p>
-          </div>
-          <div className="border-t border-white/10 pt-4">
-            <p className="text-slate-500 text-sm uppercase tracking-widest mb-1">
-              Location
-            </p>
-            <p className="text-white text-xl">{project.location}</p>
-          </div>
-          <div className="border-t border-white/10 pt-4">
-            <p className="text-slate-500 text-sm uppercase tracking-widest mb-1">
-              Value
-            </p>
-            <p className="text-white text-xl">{project.value}</p>
-          </div>
-        </div>
-        <div className="lg:col-span-8">
-          <h3 className="text-3xl text-white font-light mb-8 leading-snug">
-            Project Overview
-          </h3>
-          <p className="text-slate-400 text-lg leading-relaxed mb-12">
-            {project.desc}
-          </p>
-          <p className="text-slate-400 text-lg leading-relaxed mb-12">
-            The challenge was not just physical, but environmental. By utilizing
-            advanced modeling software, we were able to predict wind loads and
-            thermal stresses with 99.9% accuracy, resulting in a structure that
-            is as efficient as it is beautiful.
-          </p>
+      <div className="container mx-auto px-6 max-w-4xl">
+        <h3 className="text-2xl md:text-3xl text-[color:var(--navy)] font-bold mb-6 md:mb-8 leading-snug">
+          Engineering Challenge
+        </h3>
+        <p className="text-slate-600 text-lg md:text-xl leading-relaxed mb-12 font-light">
+          The challenge was not just physical, but environmental. By utilizing
+          advanced modeling software, we were able to predict wind loads and
+          thermal stresses with 99.9% accuracy, resulting in a structure that is
+          as efficient as it is beautiful. The structural integrity relies on a
+          core-outrigger system that minimizes material usage while maximizing
+          floor space.
+        </p>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="h-64 bg-slate-800"></div>
-            <div className="h-64 bg-slate-800"></div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 my-16">
+          <div className="h-64 md:h-80 bg-slate-100 rounded-sm overflow-hidden">
+            <img
+              src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=800"
+              className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all"
+            />
+          </div>
+          <div className="h-64 md:h-80 bg-slate-100 rounded-sm overflow-hidden mt-0 md:mt-16">
+            <img
+              src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&q=80&w=800"
+              className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all"
+            />
           </div>
         </div>
       </div>
@@ -683,99 +700,102 @@ const ProjectDetailPage: React.FC<ProjectDetailProps> = ({
   );
 };
 
-const ContactPage: React.FC = () => {
+const ContactPage = () => {
   return (
-    <div className="pt-32 pb-20 container mx-auto px-6 min-h-screen flex flex-col justify-center">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-20">
-        <div>
-          <p className="text-[color:var(--teal)] font-mono text-sm tracking-widest uppercase mb-4">
+    <div className="pt-24 md:pt-32 pb-20 container mx-auto px-6 min-h-screen flex flex-col justify-center">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 md:gap-20">
+        <div className="lg:col-span-5">
+          <p className="text-[color:var(--blue)] font-bold text-sm tracking-widest uppercase mb-6 flex items-center gap-2">
+            <span className="w-2 h-2 bg-[color:var(--blue)] rounded-full"></span>{" "}
             Contact Us
           </p>
-          <h1 className="text-5xl md:text-7xl text-white font-light mb-8">
-            Let's start a conversation.
+          <h1 className="text-5xl md:text-7xl text-[color:var(--navy)] font-bold mb-8 md:mb-12 tracking-tight">
+            Let's build something iconic.
           </h1>
-          <p className="text-slate-400 text-xl leading-relaxed mb-12">
-            Whether you have a visionary project in mind or need expert
-            consultation on infrastructure challenges, our global team is ready.
-          </p>
 
-          <div className="space-y-8">
-            <div className="flex items-start gap-6">
-              <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-[color:var(--teal)] shrink-0">
-                <Phone />
-              </div>
-              <div>
-                <p className="text-white text-lg">+1 (555) 091-2345</p>
-                <p className="text-slate-500">Mon-Fri, 9am - 6pm EST</p>
-              </div>
+          <div className="space-y-8 md:space-y-10">
+            <div className="group">
+              <p className="text-slate-400 text-sm uppercase tracking-widest mb-2">
+                Call Us
+              </p>
+              <p className="text-xl md:text-2xl text-[color:var(--navy)] group-hover:text-[color:var(--blue)] transition-colors cursor-pointer">
+                +1 (555) 091-2345
+              </p>
             </div>
-            <div className="flex items-start gap-6">
-              <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-[color:var(--teal)] shrink-0">
-                <Mail />
-              </div>
-              <div>
-                <p className="text-white text-lg">hello@quadinfra.com</p>
-                <p className="text-slate-500">Online Support 24/7</p>
-              </div>
+            <div className="group">
+              <p className="text-slate-400 text-sm uppercase tracking-widest mb-2">
+                Email Us
+              </p>
+              <p className="text-xl md:text-2xl text-[color:var(--navy)] group-hover:text-[color:var(--blue)] transition-colors cursor-pointer">
+                hello@quadfourinfra.com
+              </p>
             </div>
-            <div className="flex items-start gap-6">
-              <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-[color:var(--teal)] shrink-0">
-                <MapPin />
-              </div>
-              <div>
-                <p className="text-white text-lg">101 Innovation Blvd</p>
-                <p className="text-slate-500">New York, NY 10011</p>
-              </div>
+            <div className="group">
+              <p className="text-slate-400 text-sm uppercase tracking-widest mb-2">
+                Visit Us
+              </p>
+              <p className="text-xl md:text-2xl text-[color:var(--navy)]">
+                101 Innovation Blvd
+                <br />
+                New York, NY 10011
+              </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white/[0.02] p-10 border border-white/10">
-          <form className="space-y-8" onSubmit={(e) => e.preventDefault()}>
-            <div className="grid grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-xs text-[color:var(--teal)] uppercase tracking-widest">
+        <div className="lg:col-span-7 bg-white p-8 md:p-12 border border-[color:var(--navy)]/5 rounded-3xl shadow-2xl">
+          <form
+            className="space-y-8 md:space-y-10"
+            onSubmit={(e) => e.preventDefault()}
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-4 group">
+                <label className="text-xs text-[color:var(--navy)] font-bold uppercase tracking-widest group-focus-within:text-[color:var(--blue)] transition-colors">
                   Name
                 </label>
                 <input
                   type="text"
-                  className="w-full bg-transparent border-b border-white/20 py-2 text-white focus:border-[color:var(--teal)] outline-none transition-colors"
+                  className="w-full bg-transparent border-b border-[color:var(--navy)]/20 py-4 text-[color:var(--navy)] text-lg focus:border-[color:var(--blue)] outline-none transition-colors"
                   placeholder="John Doe"
                 />
               </div>
-              <div className="space-y-2">
-                <label className="text-xs text-[color:var(--teal)] uppercase tracking-widest">
+              <div className="space-y-4 group">
+                <label className="text-xs text-[color:var(--navy)] font-bold uppercase tracking-widest group-focus-within:text-[color:var(--blue)] transition-colors">
                   Company
                 </label>
                 <input
                   type="text"
-                  className="w-full bg-transparent border-b border-white/20 py-2 text-white focus:border-[color:var(--teal)] outline-none transition-colors"
+                  className="w-full bg-transparent border-b border-[color:var(--navy)]/20 py-4 text-[color:var(--navy)] text-lg focus:border-[color:var(--blue)] outline-none transition-colors"
                   placeholder="Organization Inc."
                 />
               </div>
             </div>
-            <div className="space-y-2">
-              <label className="text-xs text-[color:var(--teal)] uppercase tracking-widest">
+            <div className="space-y-4 group">
+              <label className="text-xs text-[color:var(--navy)] font-bold uppercase tracking-widest group-focus-within:text-[color:var(--blue)] transition-colors">
                 Email
               </label>
               <input
                 type="email"
-                className="w-full bg-transparent border-b border-white/20 py-2 text-white focus:border-[color:var(--teal)] outline-none transition-colors"
+                className="w-full bg-transparent border-b border-[color:var(--navy)]/20 py-4 text-[color:var(--navy)] text-lg focus:border-[color:var(--blue)] outline-none transition-colors"
                 placeholder="john@example.com"
               />
             </div>
-            <div className="space-y-2">
-              <label className="text-xs text-[color:var(--teal)] uppercase tracking-widest">
+            <div className="space-y-4 group">
+              <label className="text-xs text-[color:var(--navy)] font-bold uppercase tracking-widest group-focus-within:text-[color:var(--blue)] transition-colors">
                 Message
               </label>
               <textarea
                 rows={4}
-                className="w-full bg-transparent border-b border-white/20 py-2 text-white focus:border-[color:var(--teal)] outline-none transition-colors"
+                className="w-full bg-transparent border-b border-[color:var(--navy)]/20 py-4 text-[color:var(--navy)] text-lg focus:border-[color:var(--blue)] outline-none transition-colors"
                 placeholder="Tell us about your project..."
               ></textarea>
             </div>
-            <button className="w-full bg-white text-[color:var(--darkNavy)] py-4 font-bold uppercase tracking-widest hover:bg-[color:var(--teal)] hover:text-white transition-colors">
-              Send Inquiry
+            <button className="w-full bg-[color:var(--navy)] text-white py-6 font-bold uppercase tracking-widest hover:bg-[color:var(--blue)] transition-colors rounded-full mt-4 flex items-center justify-center gap-2 group">
+              Send Inquiry{" "}
+              <ArrowRight
+                size={16}
+                className="group-hover:translate-x-1 transition-transform"
+              />
             </button>
           </form>
         </div>
@@ -784,20 +804,23 @@ const ContactPage: React.FC = () => {
   );
 };
 
-// --- MAIN APP SHELL ---
+// --- MAIN PAGE ENTRY ---
 
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [view, setView] = useState<string>("home"); // 'home', 'projects', 'project_detail', 'contact'
+  const [view, setView] = useState("home");
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
   const style = {
     "--navy": THEME.navy,
-    "--darkNavy": THEME.darkNavy,
-    "--teal": THEME.teal,
-    "--green": THEME.green,
+    "--blue": THEME.blue,
+    "--yellow": THEME.yellow,
+    "--bg": THEME.bg,
     "--white": THEME.white,
+    "--logo-bar1": LOGO_COLORS.bar1,
+    "--logo-bar2": LOGO_COLORS.bar2,
+    "--logo-bar3": LOGO_COLORS.bar3,
   } as React.CSSProperties;
 
   useEffect(() => {
@@ -806,7 +829,6 @@ export default function Home() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Navigation Helper
   const navigate = (page: string) => {
     setView(page);
     setMenuOpen(false);
@@ -816,42 +838,48 @@ export default function Home() {
   return (
     <div
       style={style}
-      className="bg-[color:var(--darkNavy)] min-h-screen font-sans selection:bg-[color:var(--teal)] selection:text-white overflow-x-hidden"
+      className="bg-[color:var(--bg)] min-h-[100svh] font-sans selection:bg-[color:var(--yellow)] selection:text-[color:var(--navy)] overflow-x-hidden text-[color:var(--navy)]"
     >
       {/* --- HEADER --- */}
       <header
         className={`fixed top-0 w-full z-50 transition-all duration-500 ${
-          scrolled
-            ? "bg-[color:var(--darkNavy)]/90 backdrop-blur-md py-4 border-b border-white/10"
+          scrolled || menuOpen
+            ? "bg-[color:var(--bg)]/90 backdrop-blur-md py-4 border-b border-[color:var(--navy)]/10"
             : "bg-transparent py-8"
-        } text-white`}
+        }`}
       >
         <div className="container mx-auto px-6 flex justify-between items-center">
           <div
             onClick={() => navigate("home")}
             className="flex items-center gap-3 z-50 relative cursor-pointer"
           >
-            <div className="flex gap-1 h-6">
-              <div className="w-1.5 h-full bg-[color:var(--navy)]"></div>
-              <div className="w-1.5 h-full bg-[color:var(--teal)]"></div>
-              <div className="w-1.5 h-full bg-[color:var(--green)]"></div>
+            {/* Logo */}
+            <div className="flex gap-1 h-8 items-end">
+              <div className="w-2 h-[60%] bg-[color:var(--logo-bar1)]"></div>
+              <div className="w-2 h-[80%] bg-[color:var(--logo-bar2)]"></div>
+              <div className="w-2 h-full bg-[color:var(--logo-bar3)]"></div>
             </div>
-            <span className="text-2xl font-bold tracking-tighter">
-              QUAD<span className="font-light text-white/70">INFRA</span>
-            </span>
+            <div className="flex flex-col justify-center">
+              <span className="text-2xl font-bold tracking-tighter text-[color:var(--navy)] leading-none">
+                QUADFOUR
+              </span>
+              <span className="text-xs font-medium tracking-widest text-[color:var(--blue)] leading-none">
+                INFRA PVT LTD
+              </span>
+            </div>
           </div>
 
           <div className="flex items-center gap-8">
             <button
               onClick={() => navigate("contact")}
-              className="hidden md:flex items-center gap-2 text-sm font-bold uppercase tracking-widest hover:text-[color:var(--teal)] transition-colors group"
+              className="hidden md:flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[color:var(--navy)] hover:text-[color:var(--blue)] transition-colors group relative z-50"
             >
               Start Project
-              <span className="block w-8 h-[1px] bg-white/30 group-hover:w-12 group-hover:bg-[color:var(--teal)] transition-all"></span>
+              <span className="block w-8 h-[1px] bg-[color:var(--navy)]/30 group-hover:w-12 group-hover:bg-[color:var(--blue)] transition-all"></span>
             </button>
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              className="z-50 relative w-12 h-12 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
+              className="z-50 relative w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-full bg-[color:var(--navy)] hover:bg-[color:var(--blue)] text-white transition-colors"
             >
               {menuOpen ? <X /> : <Menu />}
             </button>
@@ -861,19 +889,19 @@ export default function Home() {
 
       {/* --- FULL SCREEN MENU --- */}
       <div
-        className={`fixed inset-0 bg-[color:var(--darkNavy)] z-40 flex items-center justify-center transition-all duration-700 ${
+        className={`fixed inset-0 bg-[color:var(--bg)] z-40 flex items-center justify-center transition-all duration-700 ${
           menuOpen
-            ? "opacity-100 visible"
-            : "opacity-0 invisible pointer-events-none"
+            ? "opacity-100 visible clip-circle-in"
+            : "opacity-0 invisible clip-circle-out pointer-events-none"
         }`}
       >
-        <div className="container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-20">
+        <div className="container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 pt-20 md:pt-0">
           <div className="hidden md:block">
-            <p className="text-white/50 text-sm font-mono mb-8">
-              FEATURED PROJECT
+            <p className="text-[color:var(--navy)]/40 text-sm font-mono mb-8 uppercase tracking-widest">
+              Featured Work
             </p>
             <div
-              className="aspect-video bg-slate-800 overflow-hidden relative group cursor-pointer"
+              className="aspect-video bg-slate-200 overflow-hidden relative group cursor-pointer rounded-sm"
               onClick={() => {
                 setSelectedProject(PROJECTS_DATA[0]);
                 navigate("project_detail");
@@ -881,18 +909,20 @@ export default function Home() {
             >
               <img
                 src={PROJECTS_DATA[0].img}
-                className="w-full h-full object-cover opacity-60 group-hover:scale-110 transition-transform duration-700"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
                 alt="Menu Feature"
               />
-              <div className="absolute bottom-6 left-6">
-                <h4 className="text-white text-xl">{PROJECTS_DATA[0].title}</h4>
-                <p className="text-[color:var(--teal)] text-sm">
-                  Construction / 2024
+              <div className="absolute bottom-0 left-0 bg-white p-6 w-full translate-y-full group-hover:translate-y-0 transition-transform duration-500">
+                <h4 className="text-[color:var(--navy)] text-2xl font-bold">
+                  {PROJECTS_DATA[0].title}
+                </h4>
+                <p className="text-[color:var(--blue)] text-sm font-mono">
+                  {PROJECTS_DATA[0].category}
                 </p>
               </div>
             </div>
           </div>
-          <div className="flex flex-col justify-center">
+          <div className="flex flex-col justify-center pl-0 md:pl-20">
             <NavItem
               onClick={() => navigate("home")}
               label="Home"
@@ -909,17 +939,26 @@ export default function Home() {
               number="03"
             />
 
-            <div className="mt-12 flex gap-6 text-white/40">
-              <Instagram className="hover:text-white cursor-pointer transition-colors" />
-              <Linkedin className="hover:text-white cursor-pointer transition-colors" />
-              <Twitter className="hover:text-white cursor-pointer transition-colors" />
+            <div className="mt-12 md:mt-16 flex gap-8 text-[color:var(--navy)]">
+              <Instagram
+                className="hover:text-[color:var(--blue)] cursor-pointer transition-colors"
+                size={24}
+              />
+              <Linkedin
+                className="hover:text-[color:var(--blue)] cursor-pointer transition-colors"
+                size={24}
+              />
+              <Twitter
+                className="hover:text-[color:var(--blue)] cursor-pointer transition-colors"
+                size={24}
+              />
             </div>
           </div>
         </div>
       </div>
 
       {/* --- VIEW CONTENT --- */}
-      <main className="min-h-screen">
+      <main className="min-h-[100svh] pt-0">
         {view === "home" && (
           <HomePage navigate={navigate} setProject={setSelectedProject} />
         )}
@@ -933,71 +972,60 @@ export default function Home() {
       </main>
 
       {/* --- FOOTER --- */}
-      <footer className="relative bg-black pt-32 pb-12 overflow-hidden border-t border-white/10">
-        {/* Background Gradient */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--navy)_0%,_transparent_40%)] opacity-20"></div>
-
+      <footer className="relative bg-[color:var(--navy)] pt-20 md:pt-32 pb-12 overflow-hidden text-white">
         <div className="container mx-auto px-6 relative z-10">
-          {/* Top Row: CTA & Newsletter */}
-          <div className="flex flex-col lg:flex-row justify-between items-end gap-12 mb-24 border-b border-white/10 pb-12">
+          <div className="flex flex-col lg:flex-row justify-between items-start gap-12 mb-20 md:mb-24">
             <div className="max-w-2xl">
-              <h2 className="text-5xl md:text-7xl text-white font-light tracking-tight mb-6 leading-[0.9]">
-                Building the{" "}
-                <span className="text-[color:var(--teal)] font-serif italic">
-                  Unimaginable.
+              <h2 className="text-5xl md:text-8xl text-white font-bold tracking-tighter mb-8 leading-[0.9] md:leading-[0.85]">
+                Let's Build <br />
+                <span className="text-[color:var(--blue)] font-serif italic">
+                  Legacy.
                 </span>
               </h2>
-              <p className="text-slate-400 text-lg">
-                Join our newsletter for exclusive updates on global
-                infrastructure.
-              </p>
             </div>
-            <div className="w-full lg:w-auto">
-              <form
-                className="flex w-full md:w-[400px] border-b border-white/30 focus-within:border-[color:var(--teal)] transition-colors pb-4"
-                onSubmit={(e) => e.preventDefault()}
+            <div className="flex flex-col gap-8">
+              <a
+                href="mailto:hello@quadfourinfra.com"
+                className="text-2xl md:text-3xl hover:text-[color:var(--yellow)] transition-colors border-b border-white/20 pb-2"
               >
-                <input
-                  type="email"
-                  placeholder="Enter your email address"
-                  className="bg-transparent w-full text-white placeholder-white/30 outline-none text-lg"
-                />
-                <button className="text-white hover:text-[color:var(--teal)] transition-colors uppercase text-xs font-bold tracking-[0.2em] ml-4">
-                  Subscribe
-                </button>
-              </form>
+                hello@quadfourinfra.com
+              </a>
+              <div className="flex gap-4">
+                <div className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center hover:bg-white hover:text-[color:var(--navy)] transition-all cursor-pointer">
+                  <Linkedin size={20} />
+                </div>
+                <div className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center hover:bg-white hover:text-[color:var(--navy)] transition-all cursor-pointer">
+                  <Instagram size={20} />
+                </div>
+                <div className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center hover:bg-white hover:text-[color:var(--navy)] transition-all cursor-pointer">
+                  <Twitter size={20} />
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Middle Row: Links */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-40">
-            {/* Col 1: Brand */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-12 mb-20 md:mb-32 pt-12 border-t border-white/10">
             <div className="space-y-8">
-              <div className="flex items-center gap-2">
-                <div className="flex gap-1 h-5">
-                  <div className="w-1 h-full bg-[color:var(--navy)]"></div>
-                  <div className="w-1 h-full bg-[color:var(--teal)]"></div>
-                  <div className="w-1 h-full bg-[color:var(--green)]"></div>
-                </div>
-                <span className="text-xl font-bold text-white tracking-tighter">
-                  QUAD<span className="font-light text-white/60">INFRA</span>
-                </span>
+              {/* Footer Logo */}
+              <div className="flex gap-1 h-8 items-end">
+                <div className="w-2 h-[60%] bg-[color:var(--logo-bar1)]"></div>
+                <div className="w-2 h-[80%] bg-[color:var(--logo-bar2)]"></div>
+                <div className="w-2 h-full bg-[color:var(--logo-bar3)]"></div>
               </div>
-              <p className="text-slate-500 text-sm leading-relaxed">
-                Global Headquarters
-                <br />
-                101 Innovation Blvd
-                <br />
-                New York, NY 10011
-              </p>
+              <div>
+                <p className="font-bold text-white text-lg leading-none mb-1">
+                  QUADFOUR
+                </p>
+                <p className="font-medium text-[color:var(--blue)] text-xs tracking-widest leading-none">
+                  INFRA PVT LTD
+                </p>
+              </div>
             </div>
-
-            {/* Col 2: Sitemaps */}
             <div>
-              <h4 className="text-[color:var(--teal)] font-mono text-xs uppercase tracking-widest mb-8">
+              <h4 className="text-[color:var(--yellow)] font-mono text-xs uppercase tracking-widest mb-6">
                 Sitemap
               </h4>
-              <ul className="space-y-4 text-sm text-slate-400">
+              <ul className="space-y-3 text-sm text-white/60">
                 <li>
                   <button
                     onClick={() => navigate("home")}
@@ -1008,18 +1036,10 @@ export default function Home() {
                 </li>
                 <li>
                   <button
-                    onClick={() => navigate("home")}
-                    className="hover:text-white transition-colors"
-                  >
-                    About Agency
-                  </button>
-                </li>
-                <li>
-                  <button
                     onClick={() => navigate("projects")}
                     className="hover:text-white transition-colors"
                   >
-                    Selected Works
+                    Work
                   </button>
                 </li>
                 <li>
@@ -1032,103 +1052,83 @@ export default function Home() {
                 </li>
               </ul>
             </div>
-
-            {/* Col 3: Socials */}
             <div>
-              <h4 className="text-[color:var(--teal)] font-mono text-xs uppercase tracking-widest mb-8">
-                Social
+              <h4 className="text-[color:var(--yellow)] font-mono text-xs uppercase tracking-widest mb-6">
+                Services
               </h4>
-              <ul className="space-y-4 text-sm text-slate-400">
-                <li>
-                  <a
-                    href="#"
-                    className="hover:text-white transition-colors flex items-center gap-2"
-                  >
-                    LinkedIn <ArrowUpRight size={12} className="opacity-50" />
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="hover:text-white transition-colors flex items-center gap-2"
-                  >
-                    Instagram <ArrowUpRight size={12} className="opacity-50" />
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="hover:text-white transition-colors flex items-center gap-2"
-                  >
-                    Twitter <ArrowUpRight size={12} className="opacity-50" />
-                  </a>
-                </li>
+              <ul className="space-y-3 text-sm text-white/60">
+                <li>Strategy</li>
+                <li>Engineering</li>
+                <li>Construction</li>
               </ul>
             </div>
-
-            {/* Col 4: Legal */}
             <div>
-              <h4 className="text-[color:var(--teal)] font-mono text-xs uppercase tracking-widest mb-8">
-                Legal
+              <h4 className="text-[color:var(--yellow)] font-mono text-xs uppercase tracking-widest mb-6">
+                Office
               </h4>
-              <ul className="space-y-4 text-sm text-slate-400">
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Privacy Policy
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Terms of Use
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Cookie Policy
-                  </a>
-                </li>
-              </ul>
+              <address className="text-sm text-white/60 not-italic">
+                101 Innovation Blvd
+                <br />
+                New York, NY 10011
+                <br />
+                United States
+              </address>
             </div>
           </div>
 
-          {/* Massive Background Text */}
-          <div className="absolute bottom-0 left-0 w-full overflow-hidden pointer-events-none opacity-[0.03] leading-none select-none">
-            <h1 className="text-[18vw] font-bold text-white tracking-tighter text-center whitespace-nowrap translate-y-[20%]">
-              QUAD INFRA
+          <div className="flex flex-col md:flex-row justify-between items-end relative z-10">
+            <h1 className="text-[12vw] md:text-[10vw] font-bold text-white/5 tracking-tighter leading-none select-none -mb-4 md:-mb-6">
+              QUADFOUR
             </h1>
-          </div>
-
-          {/* Bottom Bar */}
-          <div className="flex flex-col md:flex-row justify-between items-center relative z-10 pt-8 border-t border-white/5">
-            <p className="text-white/30 text-xs font-mono mb-4 md:mb-0">
-              © 2024 QUAD INFRA INC. ALL RIGHTS RESERVED.
-            </p>
-            <button
-              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-              className="flex items-center gap-2 text-white text-xs font-mono uppercase tracking-widest hover:text-[color:var(--teal)] transition-colors group"
-            >
-              Back to Top{" "}
-              <span className="group-hover:-translate-y-1 transition-transform">
-                <ArrowUp size={14} />
-              </span>
-            </button>
+            <div className="flex gap-8 text-xs font-mono uppercase text-white/40 mb-4">
+              <a href="#" className="hover:text-white">
+                Privacy
+              </a>
+              <a href="#" className="hover:text-white">
+                Terms
+              </a>
+              <span>© 2024</span>
+            </div>
           </div>
         </div>
       </footer>
 
-      {/* --- GLOBAL STYLES for Animations --- */}
-      <style>{`
-        .stroke-text-white {
-          -webkit-text-stroke: 1px rgba(255, 255, 255, 0.2);
+      {/* --- GLOBAL STYLES --- */}
+      <style jsx global>{`
+        .stroke-text-navy {
+          -webkit-text-stroke: 1px rgba(0, 48, 87, 0.3);
         }
         @keyframes marquee {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-50%);
+          }
         }
         .animate-marquee {
           animation: marquee 20s linear infinite;
         }
-        /* Hide scrollbar */
+        @keyframes pulse-slow {
+          0%,
+          100% {
+            opacity: 0.2;
+            transform: scale(1);
+          }
+          50% {
+            opacity: 0.3;
+            transform: scale(1.1);
+          }
+        }
+        .animate-pulse-slow {
+          animation: pulse-slow 8s ease-in-out infinite;
+        }
+        .clip-circle-in {
+          clip-path: circle(150% at 100% 0);
+        }
+        .clip-circle-out {
+          clip-path: circle(0% at 100% 0);
+        }
         .no-scrollbar::-webkit-scrollbar {
           display: none;
         }
