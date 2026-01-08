@@ -177,9 +177,8 @@ const RevealText = ({
   return (
     <div ref={ref} className={`overflow-hidden ${className}`}>
       <div
-        className={`transition-transform duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-          isVisible ? "translate-y-0" : "translate-y-full"
-        }`}
+        className={`transition-transform duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] ${isVisible ? "translate-y-0" : "translate-y-full"
+          }`}
         style={{ transitionDelay: `${delay}ms` }}
       >
         {children}
@@ -268,7 +267,7 @@ const HomePage = ({
   return (
     <>
       {/* HERO SECTION */}
-      <section className="relative min-h-[100svh] flex items-center pt-20 overflow-hidden bg-[color:var(--bg)]">
+      <section className="relative min-h-[100svh] flex items-start md:items-center pt-32 md:pt-0 md:pb-24 overflow-hidden bg-[color:var(--bg)]">
         <div className="absolute top-[-10%] right-[-10%] w-[400px] md:w-[800px] h-[400px] md:h-[800px] bg-[color:var(--yellow)]/20 rounded-full blur-[80px] md:blur-[120px] mix-blend-multiply animate-pulse-slow"></div>
         <div className="absolute bottom-[-10%] left-[-10%] w-[300px] md:w-[600px] h-[300px] md:h-[600px] bg-[color:var(--blue)]/10 rounded-full blur-[60px] md:blur-[100px] mix-blend-multiply"></div>
 
@@ -277,15 +276,15 @@ const HomePage = ({
             <RevealText className="mb-6">
               <div className="flex items-center gap-4">
                 <div className="w-3 h-3 bg-[color:var(--yellow)] rounded-full border border-[color:var(--navy)]"></div>
-                <span className="text-[color:var(--navy)] font-mono text-xs md:text-sm tracking-[0.3em] uppercase">
-                  Est. 1998 — Global Engineering
-                </span>
+                 <span className="text-[color:var(--navy)] font-mono text-xs md:text-sm tracking-[0.3em] uppercase">
+                  Global Engineering
+                </span> 
               </div>
-            </RevealText>
+            </RevealText> 
 
             <div className="space-y-2 md:space-y-4 mb-12 md:mb-16">
               <RevealText delay={100}>
-                <h1 className="text-[14vw] md:text-[8vw] font-bold text-[color:var(--navy)] tracking-tighter leading-[0.9] md:leading-[0.85] mix-blend-darken">
+                <h1 className="text-[14vw] md:text-[8vw] font-bold text-[color:var(--navy)] tracking-tighter leading-[0.9] md:leading-[0.85] mix-blend-darken pb-4">
                   Constructing
                 </h1>
               </RevealText>
@@ -302,9 +301,7 @@ const HomePage = ({
             <RevealText delay={400}>
               <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8 md:gap-12 border-t border-[color:var(--navy)]/10 pt-8 md:pt-12">
                 <p className="text-[color:var(--navy)] text-lg md:text-2xl font-light leading-relaxed max-w-2xl">
-                  QuadFour Infra Pvt Ltd is a multidisciplinary advisory and
-                  engineering firm. We bridge financial clarity with structural
-                  reality to build the unimaginable.
+                  QuadFour Infra Pvt Ltd partners with clients to translate financial clarity into buildable engineering solutions across infrastructure and construction projects.
                 </p>
                 <div className="flex gap-6 w-full md:w-auto">
                   <button
@@ -842,11 +839,10 @@ export default function Home() {
     >
       {/* --- HEADER --- */}
       <header
-        className={`fixed top-0 w-full z-50 transition-all duration-500 ${
-          scrolled || menuOpen
-            ? "bg-[color:var(--bg)]/90 backdrop-blur-md py-4 border-b border-[color:var(--navy)]/10"
-            : "bg-transparent py-8"
-        }`}
+        className={`fixed top-0 w-full z-50 transition-all duration-500 ${scrolled || menuOpen
+          ? "bg-[color:var(--bg)]/90 backdrop-blur-md py-4 border-b border-[color:var(--navy)]/10"
+          : "bg-transparent py-8"
+          }`}
       >
         <div className="container mx-auto px-6 flex justify-between items-center">
           <div
@@ -889,11 +885,10 @@ export default function Home() {
 
       {/* --- FULL SCREEN MENU --- */}
       <div
-        className={`fixed inset-0 bg-[color:var(--bg)] z-40 flex items-center justify-center transition-all duration-700 ${
-          menuOpen
-            ? "opacity-100 visible clip-circle-in"
-            : "opacity-0 invisible clip-circle-out pointer-events-none"
-        }`}
+        className={`fixed inset-0 bg-[color:var(--bg)] z-40 flex items-center justify-center transition-all duration-700 ${menuOpen
+          ? "opacity-100 visible clip-circle-in"
+          : "opacity-0 invisible clip-circle-out pointer-events-none"
+          }`}
       >
         <div className="container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 pt-20 md:pt-0">
           <div className="hidden md:block">
