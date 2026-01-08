@@ -32,6 +32,7 @@ interface Founder {
   role: string;
   img: string;
   bio: string;
+  nothing?: any;
 }
 
 interface NavItemProps {
