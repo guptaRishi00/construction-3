@@ -271,7 +271,7 @@ const HomePage = ({
         <div className="absolute top-[-10%] right-[-10%] w-[400px] md:w-[800px] h-[400px] md:h-[800px] bg-[color:var(--yellow)]/20 rounded-full blur-[80px] md:blur-[120px] mix-blend-multiply animate-pulse-slow"></div>
         <div className="absolute bottom-[-10%] left-[-10%] w-[300px] md:w-[600px] h-[300px] md:h-[600px] bg-[color:var(--blue)]/10 rounded-full blur-[60px] md:blur-[100px] mix-blend-multiply"></div>
 
-        <div className="container mx-auto px-6 relative z-10">
+        <div className="container mx-auto px-6 relative z-10 md:pt-20 sm:pt-16">
           <div className="max-w-full md:max-w-[90vw]">
             <RevealText className="mb-6">
               <div className="flex items-center gap-4">
